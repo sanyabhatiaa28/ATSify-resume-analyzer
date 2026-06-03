@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS Resume Analyzer - Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Fredoka:wght@600&family=Pacifico&family=Satisfy&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    <style>
+        /* Dashboard Layout Additions */
+        .analyzer-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 4%;
+        }
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        .upload-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid #E2E8F0;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* FIX: Added proper font mapping rules for the identity branding logo */
+        .logo {
+            font-family: 'Fredoka', 'Comfortaa', 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+            transition: color 0.3s;
+        }
+        
+        .drop-zone {
+            border: 2px dashed #14B8A6;
+            border-radius: 18px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(20, 184, 166, 0.02);
+        }
+        .drop-zone:hover {
+            background: rgba(20, 184, 166, 0.06);
+            border-color: #13524b;
+        }
+        .drop-zone i {
+            font-size: 3rem;
+            color: #14B8A6;
+            margin-bottom: 15px;
+        }
+        .jd-textarea {
+            width: 100%;
+            height: 200px;
+            border-radius: 18px;
+            border: 1px solid #E2E8F0;
+            padding: 20px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+        }
+        .jd-textarea:focus {
+            outline: none;
+            border-color: #13524b;
+            box-shadow: 0 0 0 4px rgba(19,82,75,.15);
+        }
+        .action-container {
+            text-align: center;
+            grid-column: span 2;
+        }
+        .signout-btn {
+            text-decoration: none;
+            background: transparent;
+            border: 1px solid #13524b;
+            color: #13524b;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .signout-btn:hover {
+            background: #13524b;
+            color: white;
+        }
+        /* Dashboard Info Sections */
+        .info-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .info-header h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+        .score-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #E2E8F0;
+        }
+        .score-table th, .score-table td {
+            padding: 18px 24px;
+            text-align: left;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .score-table th {
+            background: rgba(20, 184, 166, 0.05);
+            font-weight: 700;
+        }
+        
+        /* Dark Mode Extensions */
+        .dark-mode .logo {
+            color: #ffffff !important;
+        }
+        .dark-mode .upload-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+        .dark-mode .jd-textarea, .dark-mode .score-table {
+            background: #0f172a;
+            color: white;
+            border: 1px solid #334155;
+        }
+        .dark-mode .score-table th {
+            background: rgba(20, 184, 166, 0.1);
+        }
+        .dark-mode .signout-btn {
+            border-color: #14B8A6;
+            color: #14B8A6;
+        }
+        .dark-mode .signout-btn:hover {
+            background: #14B8A6;
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav class="navbar" style="padding: 24px 4%; display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+        <div class="logo">
+            ATSify
+        </div>
+        <div style="flex: 1;"></div>
+        <div class="nav-right" style="display: flex; align-items: center;">
+            <button class="theme-toggle" style="margin-right: 15px; background: none; border: none; font-size: 1.4rem; cursor: pointer;">🌙</button>
+            <a href="/logout" class="signout-btn">Sign Out</a>
+        </div>
+    </nav>
+</header>
+
+<main class="analyzer-container">
+    
+    <div class="info-header">
+        <h2>Analyze Your Profile Match</h2>
+        <p style="color: #64748B; margin-top: 10px;">Upload your resume and supply the target job profile specification to evaluate compatibility.</p>
+    </div>
+
+    <form action="/analyze" method="POST" enctype="multipart/form-data" class="workspace-grid">
+        
+        <div class="upload-card">
+            <h3>1. Resume Attachment</h3>
+            <p style="color: #64748B; font-size: 0.95rem;">Provide your compiled document format (PDF preferred).</p>
+            <label class="drop-zone" id="drop-zone-wrapper">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <p id="file-label-text">Drag file here or click to browse</p>
+                <input type="file" name="resume" id="resume-file-input" accept=".pdf" style="display: none;" required>
+            </label>
+        </div>
+
+        <div class="upload-card">
+            <h3>2. Job Description</h3>
+            <p style="color: #64748B; font-size: 0.95rem;">Paste the entire role summary or requirement text below.</p>
+            <textarea name="job_description" class="jd-textarea" placeholder="Paste the duties, technical needs, and role profile guidelines here..." required></textarea>
+        </div>
+
+        <div class="action-container">
+            <button type="submit" class="login-btn" style="max-width: 300px; display: inline-block;">Calculate Compatibility Score</button>
+        </div>
+    </form>
+
+    <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 60px 0;">
+
+    <section class="dashboard-info-section">
+        <div class="info-header" style="text-align: left; margin-bottom: 30px;">
+            <h2><i class="fa-solid fa-gears" style="color: #14B8A6; margin-right: 10px;"></i>How to Use ATSify</h2>
+            <p style="color: #64748B; margin-top: 5px;">Follow these four simple steps to evaluate your document compatibility against any production job profile:</p>
+        </div>
+        
+        <div class="feature-grid" style="margin-bottom: 60px;">
+            <div class="feature-card" style="text-align: left;">
+                <div style="background: rgba(20, 184, 166, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #14B8A6; margin-bottom: 15px;">1</div>
+                <h3>Upload Resume</h3>
+                <p style="color: #64748B; font-size: 0.9rem; margin-top: 5px;">Attach your compiled resume PDF (LaTeX formats are fully supported and parsed accurately).</p>
+            </div>
+            <div class="feature-card" style="text-align: left;">
+                <div style="background: rgba(20, 184, 166, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #14B8A6; margin-bottom: 15px;">2</div>
+                <h3>Provide Context</h3>
+                <p style="color: #64748B; font-size: 0.9rem; margin-top: 5px;">Paste the target company's job description text into the dedicated requirement input workspace.</p>
+            </div>
+            <div class="feature-card" style="text-align: left;">
+                <div style="background: rgba(20, 184, 166, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #14B8A6; margin-bottom: 15px;">3</div>
+                <h3>Compute Alignment</h3>
+                <p style="color: #64748B; font-size: 0.9rem; margin-top: 5px;">Click the calculation action button to pass both texts into our backend natural language processing pipes.</p>
+            </div>
+            <div class="feature-card" style="text-align: left;">
+                <div style="background: rgba(20, 184, 166, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #14B8A6; margin-bottom: 15px;">4</div>
+                <h3>Optimize & Refine</h3>
+                <p style="color: #64748B; font-size: 0.9rem; margin-top: 5px;">Review keyword missing indicators, density metrics, and structural recommendations to improve your layout.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FIXED: Added Section Header for Core Processing Techniques -->
+    <section class="dashboard-info-section" style="margin-bottom: 60px;">
+        <div class="info-header" style="text-align: left; margin-bottom: 30px;">
+            <h2><i class="fa-solid fa-bolt" style="color: #14B8A6; margin-right: 10px;"></i>Core Processing Techniques</h2>
+            <p style="color: #64748B; margin-top: 5px;">Under the hood, our custom NLP compilation pipeline breaks down engineering concepts systematically:</p>
+        </div>
+
+        <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-bottom: 60px; gap: 20px;">
+            
+            <div class="feature-card" style="text-align: left; display: flex; gap: 15px; align-items: flex-start;">
+                <i class="fa-solid fa-tags" style="color: #14B8A6; font-size: 1.5rem; margin-top: 3px;"></i>
+                <div>
+                    <h3>Missing Keyword Extraction</h3>
+                    <p style="color: #64748B; font-size: 0.9rem; margin-top: 5px;">Isolates specific technical stack terms, libraries, or hard skills present in the JD that your resume completely skipped.</p>
+                </div>
+            </div>
+
+            <div class="feature-card" style="text-align: left; display: flex; gap: 15px; align-items: flex-start;">
+                <i class="fa-solid fa-code-branch" style="color: #38BDF8; font-size: 1.5rem; margin-top: 3px;"></i>
+                <div>
+                    <h3>Custom Regex Tokenization</h3>
+                    <p style="color: #64748B; font-size: 0.9rem; margin-top: 5px;">Uses specialized word-boundary rules to scan text tokens while perfectly preserving technical symbols like C++, C#, and Node.js.</p>
+                </div>
+            </div>
+
+            <div class="feature-card" style="text-align: left; display: flex; gap: 15px; align-items: flex-start;">
+                <i class="fa-solid fa-language" style="color: #F59E0B; font-size: 1.5rem; margin-top: 3px;"></i>
+                <div>
+                    <h3>Shorthand Normalization Matrix</h3>
+                    <p style="color: #64748B; font-size: 0.9rem; margin-top: 5px;">Intercepts technical abbreviations like DSA, MERN, or OS and maps them directly to full definitions so shortcuts aren't penalized.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="dashboard-info-section" style="margin-bottom: 40px;">
+        <div class="info-header" style="text-align: left; margin-bottom: 20px;">
+            <h2><i class="fa-solid fa-ranking-star" style="color: #14B8A6; margin-right: 10px;"></i>Understanding Your Scoring Scale</h2>
+            <p style="color: #64748B; margin-top: 5px;">The compatibility engine organizes ranking thresholds into distinct performance bands:</p>
+        </div>
+
+        <table class="score-table">
+            <thead>
+                <tr>
+                    <th>Score Scale Range</th>
+                    <th>Profile Assessment Meaning</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-weight: 700; color: #14B8A6; width: 25%;">90% – 100%</td>
+                    <td><strong>Excellent Match</strong> – Profile shows deep semantic alignment and completely covers critical system filters. Highly likely to bypass automated screenings.</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700; color: #38BDF8;">80% – 89%</td>
+                    <td><strong>Good Match</strong> – Document covers core technical frameworks but shows minor missing vocabulary gaps. Easily adjustable.</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700; color: #F59E0B;">70% – 79%</td>
+                    <td><strong>Fair Match</strong> – Base structural criteria are met, but key vocabulary optimizations are highly recommended before application submission.</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700; color: #EF4444;">Below 70%</td>
+                    <td><strong>Weak Match</strong> – Significant structural or technical phrase mismatch. Focus on realigning bullet descriptions directly with the target job guidelines.</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- FAQ SECTION CONTAINER -->
+    <section class="faq-section" style="margin-top: 60px; margin-bottom: 40px;">
+        <div class="info-header" style="text-align: left; margin-bottom: 30px;">
+            <h2><i class="fa-solid fa-circle-question" style="color: #14B8A6; margin-right: 10px;"></i>Frequently Asked Questions</h2>
+            <p style="color: #64748B; margin-top: 5px;">Quick answers to the most common questions about optimizing your resume for ATS filters.</p>
+        </div>
+
+        <div class="faq-container" style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
+            
+            <!-- FAQ Item 1 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What does a resume checker do and how does it work?</span>
+                    <i class="fa-solid fa-plus faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>A resume checker scans your resume to see how well it meets the standards used by Applicant Tracking Systems (ATS) and recruiters. It looks at key factors such as keyword usage, formatting, section organization, and overall clarity by comparing your document to common job descriptions or ATS requirements to identify missing tokens or confusing layouts.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 2 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What is a good ATS score?</span>
+                    <i class="fa-solid fa-plus faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>A good ATS score is 80% or higher. Scoring between 80–89% indicates a strong profile alignment that meets most criteria with only minor vocabulary gaps, while scores above 90% show exceptional match characteristics highly likely to clear automated parsing rules seamlessly.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 3 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What common mistakes do ATS resume checkers find in resumes?</span>
+                    <i class="fa-solid fa-plus faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>Common critical compliance issues include complex structural formatting (such as dense tables, multi-column configurations, embedded images, or graphics), non-standard heading names that confuse system models, complete lack of technical job description keywords, and inconsistent date formatting parameters.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 4 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How do I improve my resume score?</span>
+                    <i class="fa-solid fa-plus faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>To enhance your score, explicitly incorporate missing technical skills and qualifications naturally into previous roles. Use standard section headers like "Work Experience" or "Skills," opt for single-column layouts without graphics or tables, spell out acronyms completely alongside their short forms, and thoroughly quantify achievements with measurable numeric data.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 5 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Can modern ATS systems read PDF files?</span>
+                    <i class="fa-solid fa-plus faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes, modern ATS software can comfortably process PDF files, provided the document is not password-encrypted and retains its native searchable text layout layers. Scanned PDFs, flat image files, or multi-column grids can still cause unexpected parsing dropouts or tokenization errors during text processing extraction layers.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ACCORDION STYLING INJECTOR -->
+    <style>
+        .faq-item {
+            background: #ffffff;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+            transition: border-color 0.25s, background-color 0.3s;
+        }
+        .faq-question {
+            width: 100%;
+            padding: 22px 28px;
+            background: none;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+            cursor: pointer;
+            gap: 20px;
+        }
+        .faq-question:hover {
+            background: rgba(20, 184, 166, 0.02);
+        }
+        .faq-icon {
+            font-size: 1rem;
+            color: #64748B;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s;
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(248, 250, 252, 0.5);
+        }
+        .faq-answer p {
+            padding: 0 28px 24px 28px;
+            color: #475569;
+            line-height: 1.65;
+            font-size: 0.98rem;
+            margin: 0;
+        }
+        
+        /* Active Expanded State Toggle Styles */
+        .faq-item.active {
+            border-color: #14B8A6;
+        }
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg); /* Flips + into an elegant closer sign */
+            color: #14B8A6;
+        }
+        
+        /* Dark Mode CSS Scope Extensions */
+        .dark-mode .faq-item {
+            background: #111827 !important;
+            border-color: #1f2937 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+        }
+        .dark-mode .faq-question {
+            color: #f1f5f9 !important;
+        }
+        .dark-mode .faq-question:hover {
+            background: rgba(45, 212, 191, 0.03) !important;
+        }
+        .dark-mode .faq-answer {
+            background: #0b0f19 !important;
+        }
+        .dark-mode .faq-answer p {
+            color: #94a3b8 !important;
+        }
+        .dark-mode .faq-item.active {
+            border-color: #2dd4bf !important;
+        }
+        .dark-mode .faq-item.active .faq-icon {
+            color: #2dd4bf !important;
+        }
+    </style>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <h3>Resume Analyzer</h3>
+        <p>Contact: sanyaaaa28@gmail.com</p>
+        <p>© 2026 Resume Analyzer. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script>
+    // Theme setup mirroring the authorization page
+    const themeButton = document.querySelector(".theme-toggle");
+    if(localStorage.getItem("theme") === "dark"){
+        document.body.classList.add("dark-mode");
+        themeButton.textContent = "☀️";
+    }
+    
+    themeButton.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        if(document.body.classList.contains("dark-mode")){
+            localStorage.setItem("theme","dark");
+            themeButton.textContent = "☀️";
+        }else{
+            localStorage.setItem("theme","light");
+            themeButton.textContent = "🌙";
+        }
+    });
+
+    // Dynamic File Input UI Name Updater
+    const fileInput = document.getElementById("resume-file-input");
+    const labelText = document.getElementById("file-label-text");
+    if(fileInput && labelText) {
+        fileInput.addEventListener("change", (e) => {
+            if(e.target.files.length > 0){
+                labelText.innerText = "Selected file: " + e.target.files[0].name;
+                labelText.style.color = "#14B8A6";
+                labelText.style.fontWeight = "600";
+            }
+        });
+    }
+    // --- ACCORDION EXPANSION INTERACTION LOGIC ---
+    const faqQuestions = document.querySelectorAll(".faq-question");
+
+    faqQuestions.forEach(question => {
+        question.addEventListener("click", () => {
+            const faqItem = question.parentElement;
+            const faqAnswer = question.nextElementSibling;
+            
+            // Toggle active markers on click
+            faqItem.classList.toggle("active");
+            
+            if (faqItem.classList.contains("active")) {
+                faqAnswer.style.maxHeight = faqAnswer.scrollHeight + "px";
+            } else {
+                faqAnswer.style.maxHeight = "0px";
+            }
+        });
+    });
+</script>
+</body>
+</html>

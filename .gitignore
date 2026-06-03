@@ -1,0 +1,11 @@
+# Ignore the entire virtual environment folder (keeps the upload light)
+venv/
+
+# Ignore compiled python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore local environment variable secrets or local IDE files
+.env
+.vscode/
+.idea/
