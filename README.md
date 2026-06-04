@@ -54,8 +54,6 @@ ATSify-resume-analyzer/
 │   ├── login.html
 │   └── signup.html
 │
-├── nlp/
-│   └── .gitkeep
 │
 ├── app.py
 ├── schema.sql
