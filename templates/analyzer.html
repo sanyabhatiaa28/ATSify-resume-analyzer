@@ -35,8 +35,6 @@
             flex-direction: column;
             gap: 20px;
         }
-        
-        /* FIX: Added proper font mapping rules for the identity branding logo */
         .logo {
             font-family: 'Fredoka', 'Comfortaa', 'Space Grotesk', sans-serif;
             font-weight: 800;
@@ -126,7 +124,7 @@
             font-weight: 700;
         }
         
-        /* Dark Mode Extensions */
+       
         .dark-mode .logo {
             color: #ffffff !important;
         }
@@ -228,8 +226,6 @@
             </div>
         </div>
     </section>
-
-    <!-- FIXED: Added Section Header for Core Processing Techniques -->
     <section class="dashboard-info-section" style="margin-bottom: 60px;">
         <div class="info-header" style="text-align: left; margin-bottom: 30px;">
             <h2><i class="fa-solid fa-bolt" style="color: #14B8A6; margin-right: 10px;"></i>Core Processing Techniques</h2>
@@ -305,8 +301,7 @@
         </div>
 
         <div class="faq-container" style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
-            
-            <!-- FAQ Item 1 -->
+    
             <div class="faq-item">
                 <button class="faq-question">
                     <span>What does a resume checker do and how does it work?</span>
@@ -317,7 +312,6 @@
                 </div>
             </div>
 
-            <!-- FAQ Item 2 -->
             <div class="faq-item">
                 <button class="faq-question">
                     <span>What is a good ATS score?</span>
@@ -328,7 +322,6 @@
                 </div>
             </div>
 
-            <!-- FAQ Item 3 -->
             <div class="faq-item">
                 <button class="faq-question">
                     <span>What common mistakes do ATS resume checkers find in resumes?</span>
@@ -339,7 +332,6 @@
                 </div>
             </div>
 
-            <!-- FAQ Item 4 -->
             <div class="faq-item">
                 <button class="faq-question">
                     <span>How do I improve my resume score?</span>
@@ -350,7 +342,6 @@
                 </div>
             </div>
 
-            <!-- FAQ Item 5 -->
             <div class="faq-item">
                 <button class="faq-question">
                     <span>Can modern ATS systems read PDF files?</span>
@@ -364,7 +355,6 @@
         </div>
     </section>
 
-    <!-- ACCORDION STYLING INJECTOR -->
     <style>
         .faq-item {
             background: #ffffff;
@@ -411,16 +401,14 @@
             margin: 0;
         }
         
-        /* Active Expanded State Toggle Styles */
         .faq-item.active {
             border-color: #14B8A6;
         }
         .faq-item.active .faq-icon {
-            transform: rotate(45deg); /* Flips + into an elegant closer sign */
+            transform: rotate(45deg); 
             color: #14B8A6;
         }
         
-        /* Dark Mode CSS Scope Extensions */
         .dark-mode .faq-item {
             background: #111827 !important;
             border-color: #1f2937 !important;
@@ -457,7 +445,6 @@
 </footer>
 
 <script>
-    // Theme setup mirroring the authorization page
     const themeButton = document.querySelector(".theme-toggle");
     if(localStorage.getItem("theme") === "dark"){
         document.body.classList.add("dark-mode");
@@ -475,7 +462,6 @@
         }
     });
 
-    // Dynamic File Input UI Name Updater
     const fileInput = document.getElementById("resume-file-input");
     const labelText = document.getElementById("file-label-text");
     if(fileInput && labelText) {
@@ -487,7 +473,6 @@
             }
         });
     }
-    // --- ACCORDION EXPANSION INTERACTION LOGIC ---
     const faqQuestions = document.querySelectorAll(".faq-question");
 
     faqQuestions.forEach(question => {
@@ -495,7 +480,6 @@
             const faqItem = question.parentElement;
             const faqAnswer = question.nextElementSibling;
             
-            // Toggle active markers on click
             faqItem.classList.toggle("active");
             
             if (faqItem.classList.contains("active")) {

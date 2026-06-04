@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 app.secret_key = 'your_super_secret_key_bro'
 
-# MySQL Configuration
+# MySQL Config.
 app.config['MYSQL_HOST'] = os.environ.get('DB_HOST', 'localhost')
 app.config['MYSQL_USER'] = os.environ.get('DB_USER', 'root')       
 app.config['MYSQL_PASSWORD'] = os.environ.get('DB_PASSWORD', 'vhivfrc#7878')       
@@ -26,7 +26,7 @@ def extract_text_from_pdf(file):
             text += page_text + " "
     return text
 
-# CLEANED AND PRECISE NORMALIZATION (No more keyword leaking!)
+# NORMALIZATION 
 def clean_and_normalize_text(text):
     if not text:
         return ""
@@ -160,7 +160,7 @@ def analyze():
                       <p style='color:#F59E0B;'>Your PDF text could not be compiled cleanly. Ensure it contains actual font formats.</p>
                       <br><a href='/analyzer'>Go Back</a>"""
         
-        # PRECISE ONTOLOGY LIST - No overlapping fallback pollution
+        # PRECISE list of technology
         CORE_TECH_ONTOLOGY = [
             'java', 'python', 'javascript', 'typescript', 'c++', 'c#', 'go', 'php', 'html', 'css', 
             'bootstrap', 'tailwind css', 'react.js', 'next.js', 'angular', 'vue.js', 'node.js', 'express.js', 
@@ -255,7 +255,6 @@ def analyze():
         missing_html = "".join([f"<span class='badge-missing'>{word}</span>" for word in missing_keywords]) or "<p style='color: #64748B;'>No major missing keywords detected.</p>"
         rec_html = "".join([f"<li style='margin-bottom: 14px; display: flex; gap: 12px; align-items: flex-start; text-align: left;'><i class='fa-solid fa-circle-check' style='color: {theme_color}; margin-top: 4px; flex-shrink:0;'></i> <span>{rec}</span></li>" for rec in recommendations])
 
-        # RETURN TEMPLATE STRING WITH FIXED THEME TOGGLES AND ESCAPED BRACES
         return f"""
         <!DOCTYPE html>
         <html lang="en">
